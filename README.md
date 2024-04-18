@@ -19,7 +19,17 @@ To build and run the Docker container:
 2. Navigate to the directory containing the Dockerfile.
 3. Build the Docker image using the following command:
 
-###Building the Docker Image
+### Building the Docker Image
 
-```
-docker build -t my_load_tester .
+Run the following command
+```docker build -t <Your-Image-Name> .```
+This should build your docker image from Docker file by installing all the required dependencies
+
+### Running the Docker Image
+
+``` 
+docker run -it my_load_tester \
+--qps <qps-count> \
+--duration <duration-sec> \
+--url <Input-URL>
+ ```
