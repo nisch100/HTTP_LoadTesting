@@ -11,18 +11,32 @@ The argparse flags used in the script are:
 - `--duration`: Duration of the load test in seconds.
 - `--concurrent`: Number of concurrent requests.
 
+### Load Testing Behavior and Explanation
+During the load testing process, you may observe certain behaviors or outcomes that are influenced by various factors. Below are explanations for common observations:
+
+#### 1. Fluctuations in Achieved QPS
+- **Reason**: The actual queries per second (QPS) achieved during the test may fluctuate due to asynchronous execution, network latency, and server response times.
+- **Explanation**: Asynchronous requests and varying response times can impact the rate at which requests are processed, resulting in variations in the achieved QPS compared to the specified value (`--qps`).
+
+#### 2. Latency Variations
+- **Reason**: The observed latency for each request may vary based on network conditions, server load, and response times.
+- **Explanation**: Network latency, server performance, and concurrency settings influence the latency of individual requests. The reported average latency (`Average Latency`) reflects the overall performance during the test duration.
+
+
 ## Docker
 
 To build and run the Docker container:
 
 1. Ensure you have Docker installed on your machine.
 2. Navigate to the directory containing the Dockerfile.
-3. Build the Docker image using the following command:
+3. Build and run the Docker image using the instructions below:
 
 ### Building the Docker Image
 
 Run the following command
+
 ```docker build -t <Your-Image-Name> .```
+
 This should build your docker image from Docker file by installing all the required dependencies
 
 ### Running the Docker Image

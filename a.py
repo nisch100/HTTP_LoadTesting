@@ -6,6 +6,28 @@ import time
 import statistics
  
 class LoadTester:
+    """
+    A class for performing load testing on a specified URL.
+
+    Args:
+        url (str): The target URL to send HTTP requests.
+        qps (float): Queries per second (QPS) for the load test.
+        duration (int): Duration of the load test in seconds.
+        concurrent_requests (int): Number of concurrent requests to be made.
+
+    Attributes:
+        url (str): The target URL to send HTTP requests.
+        qps (float): Queries per second (QPS) for the load test.
+        duration (int): Duration of the load test in seconds.
+        concurrent_requests (int): Number of concurrent requests to be made.
+        success_count (int): Number of successful HTTP requests.
+        error_count (int): Number of failed HTTP requests.
+        latencies (list): List of latencies for successful requests.
+        start_time (float): Start time of the load test.
+        end_time (float): End time of the load test.
+        tasks (set): Set of asyncio tasks for making HTTP requests.
+        jobs (set): Set of asyncio tasks for processing finished HTTP requests.
+    """
     def __init__(self, url, qps, duration, concurrent_requests):
         self.url = url
         self.qps = qps
@@ -22,6 +44,12 @@ class LoadTester:
         self.jobs = set()
  
     def _report_partial_metrics(self):
+        """
+        Report partial metrics during the load test.
+
+        Prints current status including elapsed time, QPS, average latency,
+        number of successful requests (200 OK), and number of errors.
+        """
         elapsed_time = time.time() - self.start_time
         current_qps = (self.success_count+self.error_count+len(self.tasks))/elapsed_time
         print(f"Elapsed Time: {elapsed_time:.2f}s | QPS: {current_qps:.2f}| "
@@ -29,7 +57,12 @@ class LoadTester:
                     f"200 OK: {self.success_count} | Errors: {self.error_count}")
  
     def _report_full_metrics(self):
-        # Calculate final metrics
+        """
+        Report full metrics after the load test completes.
+
+        Calculates and prints final metrics including success rate, error rate,
+        average latency, minimum latency, and maximum latency.
+        """
         total_requests = self.success_count + self.error_count
         error_rate = self.error_count / total_requests if total_requests > 0 else 0
         total_latency = sum(self.latencies)
@@ -57,6 +90,16 @@ class LoadTester:
         plt.savefig('Latency_Request.png')
  
     async def make_request(self, session, url):
+        """
+        Make an HTTP GET request asynchronously.
+
+        Args:
+            session (aiohttp.ClientSession): An aiohttp client session.
+            url (str): The URL to make the request to.
+
+        Returns:
+            tuple: A tuple containing the HTTP status code and the request latency.
+        """
         url_start_time = time.time()
         try:
             async with session.get(url) as response:
@@ -67,6 +110,14 @@ class LoadTester:
             return None, None
  
     async def process_finished_tasks(self, done_tasks):
+        """
+        Process finished HTTP request tasks.
+
+        Updates success and error counts based on request outcomes.
+
+        Args:
+            done_tasks (set): Set of completed asyncio tasks.
+        """
         for task in done_tasks:
             status, latency = task.result()
             if status == 200:
