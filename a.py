@@ -52,9 +52,11 @@ class LoadTester:
         """
         elapsed_time = time.time() - self.start_time
         current_qps = (self.success_count+self.error_count+len(self.tasks))/elapsed_time
+        partial_throughput = (self.success_count + self.error_count) / elapsed_time
         print(f"Elapsed Time: {elapsed_time:.2f}s | QPS: {current_qps:.2f}| "
                     f"Latency: {statistics.mean(self.latencies) if len(self.latencies)>0 else 0:.4f}s | "
-                    f"200 OK: {self.success_count} | Errors: {self.error_count}")
+                    f"200 OK: {self.success_count} | Errors: {self.error_count}" | 
+                     f"Partial Throughput: {partial_throughput:.2f} rps")
  
     def _report_full_metrics(self):
         """
@@ -68,6 +70,8 @@ class LoadTester:
         total_latency = sum(self.latencies)
         average_latency = total_latency / total_requests if total_requests > 0 else 0
         success_rate = self.success_count / total_requests if total_requests > 0 else 0
+        elapsed_time = self.end_time - self.start_time
+        throughput = total_requests / elapsed_time if elapsed_time > 0 else 0
  
         print(f"Load test complete!")
         print(f"Start Time: {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(self.start_time))}")
@@ -79,6 +83,7 @@ class LoadTester:
             print(f"Average Latency: {average_latency:.4f}s")
             print(f"Min Latency: {min(self.latencies):.4f}s")
             print(f"Max Latency: {max(self.latencies):.4f}s")
+            print(f"Throughput: {throughput:.4f}s")
  
     def _plot(self):
         # Show final latency plot
@@ -147,7 +152,7 @@ class LoadTester:
                     request_counter += 1
                     n += 1
  
-                # May be use a better formula for calculating interval dynamically.
+                # formulas for calculating interval dynamically.
                 # interval = (1*self.concurrent_requests)/(2*self.qps - current_qps)
                 # interval = ((1*self.concurrent_requests) / self.qps) - 0.00001
  

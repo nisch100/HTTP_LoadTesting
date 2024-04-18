@@ -22,6 +22,10 @@ During the load testing process, you may observe certain behaviors or outcomes t
 - **Reason**: The observed latency for each request may vary based on network conditions, server load, and response times.
 - **Explanation**: Network latency, server performance, and concurrency settings influence the latency of individual requests. The reported average latency (`Average Latency`) reflects the overall performance during the test duration.
 
+#### 3. Partial Throughput & Partial QPS
+- **Reason**: The observed partial throughput has a slightly different value compared to the QPS for the partial metrics
+- **Explanation**: QPS involves sending in requests and hence uses `success `, `error` and `task queue` to compute. Since throughput only computes transaction completed we omit `task queue` as the queue holds pending jobs. 
+
 
 ## Docker
 
@@ -46,4 +50,6 @@ docker run -it my_load_tester \
 --qps <qps-count> \
 --duration <duration-sec> \
 --url <Input-URL>
+--concurrent <Requests-count>
  ```
+ #Note# - Despite increasing or decreasing the number of concurrent workers the QPS remains unaffected as the interval utilizes ```(1 * concurrent_req) /qps``` to prolong the sleep
