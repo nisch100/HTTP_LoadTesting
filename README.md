@@ -6,10 +6,10 @@ This repository contains a load testing script that allows you to test the perfo
 
 ### Argparse Flags
 The argparse flags used in the script are:
-- `--qps`: Queries per second (QPS) for the load test.
-- `--url`: URL to send HTTP requests.
-- `--duration`: Duration of the load test in seconds.
-- `--concurrent`: Number of concurrent requests.
+- `--qps`: Queries per second (QPS) for the load test. Defaults to 10
+- `--url`: URL to send HTTP requests. **Required**
+- `--duration`: Duration of the load test in seconds. Defaults to 30s
+- `--concurrent`: Number of concurrent requests. Defaults to 1 worker
 
 ### Load Testing Behavior and Explanation
 During the load testing process, you may observe certain behaviors or outcomes that are influenced by various factors. Below are explanations for common observations:
@@ -60,7 +60,7 @@ docker run -it my_load_tester \
 Upon ```docker run``` the cli displays partial metrics as the programs executes.
 Once the program finishes executing full metrics are displayed on the CLI
 
-###1. Partial Metrics
+### 1. Partial Metrics
 
 The following partial metrics were collected during the load test:
 
@@ -82,7 +82,7 @@ The following partial metrics were collected during the load test:
 - **Errors**: The number of requests that resulted in errors (non-200 status codes).
 - **Partial Throughput**: The rate of successful requests processed per second during this interval.
 
-###2.Full Metrics
+### 2.Full Metrics
 
 The following metrics are collected during the load test:
 
@@ -126,4 +126,5 @@ These metrics provide insights into the performance and reliability of the teste
 3. Hitting a unstable(Flaky) url
 
  concurrent_request is defaulted to 1 while `duration = 10s` and `qps=10`
+
 ```docker run -it load_tester --qps 10 --duration 10  --url http://en.wikipe.org```
