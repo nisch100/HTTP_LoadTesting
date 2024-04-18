@@ -60,7 +60,7 @@ docker run -it my_load_tester \
 Upon ```docker run``` the cli displays partial metrics as the programs executes.
 Once the program finishes executing full metrics are displayed on the CLI
 
-1. Partial Metrics
+**1. Partial Metrics**
 The following partial metrics were collected during the load test:
 
 | Metric               |
@@ -72,7 +72,7 @@ The following partial metrics were collected during the load test:
 | Errors               |
 | Partial Throughput   |
 
-### Explanation of Partial Metrics
+**Explanation of Partial Metrics**
 
 - **Elapsed Time**: The time elapsed since the start of the load test.
 - **QPS (Queries/s)**: The calculated Queries Per Second (QPS) based on the current test interval.
@@ -81,7 +81,7 @@ The following partial metrics were collected during the load test:
 - **Errors**: The number of requests that resulted in errors (non-200 status codes).
 - **Partial Throughput**: The rate of successful requests processed per second during this interval.
 
-2. Full Metrics
+**2.Full Metrics**
 The following metrics are collected during the load test:
 
 | Metric               |
