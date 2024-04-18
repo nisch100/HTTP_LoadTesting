@@ -124,7 +124,7 @@ These metrics provide insights into the performance and reliability of the teste
 
 ```docker run -it load_tester --qps 10 --duration 20  --url http://youtube.com```
 
-![Load Results for Youtube](img/youtube.png)
+![Load Results for Youtube](imgs/youtube.png)
 
 
 2. Hitting an invalid URl
@@ -132,19 +132,19 @@ These metrics provide insights into the performance and reliability of the teste
 ```docker run -it load_tester --qps 10 --duration 20  --url http://helloworld.ca```
 
 
-![Load Results for HelloWorld](img/broken_url.png)
+![Load Results for HelloWorld](imgs/broken_url.png)
 
 
 3. Hitting a unstable(Flaky) url
 
 ```docker run -it load_tester --qps 10 --duration 10  --url http://en.wikipe.org```
 
-![Load Results for Wikipe](img/flaky_url.png)
+![Load Results for Wikipe](imgs/flaky_url.png)
 
 4. Hitting a valid URL with limits
 
 ```docker run -it load_tester --qps 40 --duration 10  --url https://www.linkedin.com --concurrent 1```
-![Load Results for Linkedin](img/linkedin.png)
+![Load Results for Linkedin](imgs/linkedin.png)
 
 
 ## Limitations
