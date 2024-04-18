@@ -46,7 +46,7 @@ This should build your docker image from Docker file by installing all the requi
 ### Running the Docker Image
 
 ``` 
-docker run -it my_load_tester \
+docker run -it <Your-Image-Name> \
 --qps <qps-count> \
 --duration <duration-sec> \
 --url <Input-URL>

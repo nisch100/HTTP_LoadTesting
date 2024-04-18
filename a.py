@@ -1,9 +1,11 @@
 import argparse
 import asyncio
 import aiohttp
+import numpy as np
 import matplotlib.pyplot as plt
 import time
 import statistics
+from collections import defaultdict
  
 class LoadTester:
     """
@@ -39,6 +41,7 @@ class LoadTester:
         self.latencies = []
         self.start_time = None
         self.end_time = None
+        self.response_counts = defaultdict(int)
  
         self.tasks = set()
         self.jobs = set()
@@ -55,8 +58,8 @@ class LoadTester:
         partial_throughput = (self.success_count + self.error_count) / elapsed_time
         print(f"Elapsed Time: {elapsed_time:.2f}s | QPS: {current_qps:.2f}| "
                     f"Latency: {statistics.mean(self.latencies) if len(self.latencies)>0 else 0:.4f}s | "
-                    f"200 OK: {self.success_count} | Errors: {self.error_count}" | 
-                     f"Partial Throughput: {partial_throughput:.2f} rps")
+                    f"200 OK: {self.success_count} | Errors: {self.error_count} | "  
+                    f"Partial Throughput: {partial_throughput:.2f} rps")
  
     def _report_full_metrics(self):
         """
@@ -68,22 +71,36 @@ class LoadTester:
         total_requests = self.success_count + self.error_count
         error_rate = self.error_count / total_requests if total_requests > 0 else 0
         total_latency = sum(self.latencies)
-        average_latency = total_latency / total_requests if total_requests > 0 else 0
+        latency_ct = len(self.latencies)
+        average_latency = total_latency / latency_ct if latency_ct > 0 else 0
         success_rate = self.success_count / total_requests if total_requests > 0 else 0
         elapsed_time = self.end_time - self.start_time
         throughput = total_requests / elapsed_time if elapsed_time > 0 else 0
- 
-        print(f"Load test complete!")
-        print(f"Start Time: {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(self.start_time))}")
-        print(f"End Time: {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(self.end_time))}")
-        print(f"Total Number of Requests: {total_requests}")
-        print(f"Success Rate: {success_rate:.2f}")
-        print(f"Error Rate: {error_rate:.2f}")
+        latency_p50 =np.quantile(self.latencies, 0.50) if self.latencies else 0
+        latency_p95 =np.quantile(self.latencies, 0.95) if self.latencies else 0
+        latency_p99 =np.quantile(self.latencies, 0.99) if self.latencies else 0
+
+        print()
+        print("Load Test Results".center(50))
+        print(f"Start Time: {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(self.start_time))}".center(50))
+        print(f"End Time: {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(self.end_time))}".center(50))
+        print(f"Total Number of Requests: {total_requests}".center(50))
+        print(f"Success Rate: {success_rate:.2f}".center(50))
+        print(f"Error Rate: {error_rate:.2f}".center(50))
         if total_latency > 0:
-            print(f"Average Latency: {average_latency:.4f}s")
-            print(f"Min Latency: {min(self.latencies):.4f}s")
-            print(f"Max Latency: {max(self.latencies):.4f}s")
-            print(f"Throughput: {throughput:.4f}s")
+            print("-" * 50)  # Line separator
+            print("Latency Metrics".center(50))
+            print(f"Average Latency: {average_latency:.4f}s".center(50))
+            print(f"Min Latency: {min(self.latencies):.4f}s".center(50))
+            print(f"Max Latency: {max(self.latencies):.4f}s".center(50))
+            print(f"Latency P50: {latency_p50:.4f}s".center(50))
+            print(f"Latency P95: {latency_p95:.4f}s".center(50))
+            print(f"Latency P99: {latency_p99:.4f}s".center(50))
+            print(f"Average Throughput: {throughput:.4f} rps".center(50))
+        print("-" * 50)  # Line separator
+        print("Response Code Counts".center(50))
+        for code, count in self.response_counts.items():
+            print(f"Response Code {code}: {count}".center(50))
  
     def _plot(self):
         # Show final latency plot
@@ -109,8 +126,12 @@ class LoadTester:
         try:
             async with session.get(url) as response:
                 latency = time.time() - url_start_time
+                response_code = response.status
+                self.response_counts[response_code] += 1
                 return response.status, latency
         except aiohttp.ClientError as e:
+            response_code = 400  # Set 400 as baseline for client exceptions
+            self.response_counts[response_code] +=1
             print(f"Request error: {e}")
             return None, None
  
