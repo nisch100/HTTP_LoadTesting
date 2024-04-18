@@ -124,20 +124,27 @@ These metrics provide insights into the performance and reliability of the teste
 
 ```docker run -it load_tester --qps 10 --duration 20  --url http://youtube.com```
 
+![Load Results for Youtube](youtube.png)
+
+
 2. Hitting an invalid URl
 
 ```docker run -it load_tester --qps 10 --duration 20  --url http://helloworld.ca```
 
 
+![Load Results for HelloWorld](broken_url.png)
+
+
 3. Hitting a unstable(Flaky) url
 
- concurrent_request is defaulted to 1 while `duration = 10s` and `qps=10`
-
 ```docker run -it load_tester --qps 10 --duration 10  --url http://en.wikipe.org```
+
+![Load Results for Wikipe](flaky_url.png)
 
 4. Hitting a valid URL with limits
 
 ```docker run -it load_tester --qps 40 --duration 10  --url https://www.linkedin.com --concurrent 1```
+![Load Results for Linkedin](linkedin.png)
 
 
 ## Limitations
