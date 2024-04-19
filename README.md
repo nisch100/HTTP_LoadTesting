@@ -139,12 +139,14 @@ These metrics provide insights into the performance and reliability of the teste
 
 ```docker run -it load_tester --qps 10 --duration 10  --url http://en.wikipe.org```
 
-![Load Results for Wikipe](imgs/flaky_url.png)
+![Load Results for Wikipe](imgs/flakyurl.png)
 
 4. Hitting a valid URL with limits
 
 ```docker run -it load_tester --qps 40 --duration 10  --url https://www.linkedin.com --concurrent 1```
 ![Load Results for Linkedin](imgs/linkedin.png)
+
+**Note** - Additionally the programs sets a timeout for 60 secs before cancelling the pending jobs
 
 
 ## Limitations

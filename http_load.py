@@ -44,7 +44,6 @@ class LoadTester:
         self.response_counts = defaultdict(int)
  
         self.tasks = set()
-        self.jobs = set()
  
     def _report_partial_metrics(self):
         """
@@ -128,48 +127,35 @@ class LoadTester:
                 latency = time.time() - url_start_time
                 response_code = response.status
                 self.response_counts[response_code] += 1
+                if response_code == 200:
+                    self.success_count += 1
+                    self.latencies.append(latency)
+                else:
+                    self.error_count += 1
+                self._report_partial_metrics()
                 return response.status, latency
         except aiohttp.ClientError as e:
             response_code = 400  # Set 400 as baseline for client exceptions
             self.response_counts[response_code] +=1
+            self.error_count += 1
             print(f"Request error: {e}")
-            return None, None
- 
-    async def process_finished_tasks(self, done_tasks):
-        """
-        Process finished HTTP request tasks.
-
-        Updates success and error counts based on request outcomes.
-
-        Args:
-            done_tasks (set): Set of completed asyncio tasks.
-        """
-        for task in done_tasks:
-            status, latency = task.result()
-            if status == 200:
-                self.success_count += 1
-                self.latencies.append(latency)
-            else:
-                self.error_count += 1
- 
             self._report_partial_metrics()
- 
+            return None, None
+  
     async def run_load_test(self):
         interval = (1*self.concurrent_requests) / self.qps  # Interval between requests in seconds
-        current_qps = 0
         self.start_time = time.time()
  
         async with aiohttp.ClientSession() as session:
-            # tasks = set()
             request_counter = 0
  
             while time.time() < self.start_time + self.duration:
-                current_qps = request_counter / (time.time() - self.start_time + 0.0001)
                 n=0
                 while n < self.concurrent_requests:
                     task = asyncio.create_task(self.make_request(session, self.url))
-                    self.tasks.add(task)
+                    # add callback to discard the task from the tasks list after completion.
                     task.add_done_callback(self.tasks.discard)
+                    self.tasks.add(task)
                     request_counter += 1
                     n += 1
  
@@ -179,19 +165,18 @@ class LoadTester:
  
                 interval_start = time.time()
                 done, pending = await asyncio.wait(self.tasks, timeout=interval)
+                # In case the tasks are finished very quickly, we need to wait until the interval time is elapsed.
                 while time.time() - interval_start < interval:
                     pass
  
-                self.jobs.add(asyncio.create_task(self.process_finished_tasks(done)))
- 
             self.end_time = time.time()
             if len(self.tasks) > 0:
-                done, pending = await asyncio.wait(self.tasks, return_when=asyncio.ALL_COMPLETED)
- 
-            self.jobs.add(asyncio.create_task(self.process_finished_tasks(done)))
- 
-            if len(self.jobs) > 0:
-                done, pending = await asyncio.wait(self.jobs, return_when=asyncio.ALL_COMPLETED)
+                # wait for all the task to be finished so that we account for their success/failure metrics.
+                print("Waiting for request to complete or timeout")
+                done, pending = await asyncio.wait(self.tasks, timeout=60, return_when=asyncio.ALL_COMPLETED)
+                for pending_task in pending:
+                    pending_task.cancel()
+
  
         self._report_full_metrics()
         self._plot()
@@ -207,6 +192,6 @@ if __name__ == '__main__':
     parser.add_argument('--duration', type=int, default=30, help='Duration of the load test in seconds')
     parser.add_argument('--concurrent', type=int, default=1, help='Number of concurrent requests')
     args = parser.parse_args()
- 
+    
     load_tester = LoadTester(args.url, args.qps, args.duration, args.concurrent)
     load_tester.start()
