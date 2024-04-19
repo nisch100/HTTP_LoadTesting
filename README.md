@@ -112,7 +112,7 @@ The following metrics are collected during the load test:
 - **Max Latency**: The maximum response latency observed.
 - **Throughput**: The rate of successful requests processed per second during the test.
 - **P50/95/99**: Latency percenticle
--**ResponseCode Count**: Counts response codes for all the requests sent out
+- **ResponseCode Count**: Counts response codes for all the requests sent out
 
 
 These metrics provide insights into the performance and reliability of the tested system under load conditions.
@@ -153,7 +153,7 @@ These metrics provide insights into the performance and reliability of the teste
 1. This rate of qps is dependent on  how fast  `aiohttp.ClientSession()` is capable of hitting the server. In this program given it's limitations/latency the program support max achievable qps upto a few 100's with enough concurrent workers
 
 
-##Further Enhancement
+## Further Enhancement
 1. The maximum QPS can be further improved from 100's to over 1000's by using more advanced http calling libraries such as pycurl
 2. Simulate more than 1 client to sent multiple requests.
 3. Build Dashboards to monitor QPS
