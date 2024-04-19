@@ -5,7 +5,7 @@ FROM python:3.9
 WORKDIR /app
 
 # Copy the Python script into the container
-COPY a.py .
+COPY http_load.py .
 
 # Install any Python dependencies
 RUN pip install --upgrade pip && \
@@ -13,4 +13,4 @@ RUN pip install --upgrade pip && \
     pip install requests
 
 # Set the entry point to the Python script
-ENTRYPOINT ["python", "a.py"]
+ENTRYPOINT ["python", "http_load.py"]
